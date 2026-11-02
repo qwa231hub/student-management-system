@@ -1,3 +1,4 @@
+""OpenRepos" (https://img.shields.io/endpoint?url=https://openrepos.org/status/student-management-system.openrepos.org.json&style=flat-square)" (https://student-management-system.openrepos.org/)
 Student Management System
 
 A simple web-based Student Management System created as an educational project using HTML, CSS, and JavaScript.
