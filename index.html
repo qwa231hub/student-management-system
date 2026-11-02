@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple student management system for a college project demonstration.">
+  <title>Student Management System</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #687386;
+      --line: #e5eaf2;
+      --primary: #3659d9;
+      --primary-dark: #2846b6;
+      --danger: #c0394b;
+      --success: #18845b;
+      --shadow: 0 12px 35px rgba(24, 39, 75, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); }
+    .topbar { background: #17264b; color: white; padding: 22px 20px; }
+    .topbar-inner { max-width: 1120px; margin: auto; display: flex; align-items: center; gap: 14px; }
+    .logo { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: #ffffff1c; font-size: 24px; }
+    h1 { margin: 0; font-size: clamp(20px, 3vw, 28px); letter-spacing: -.4px; }
+    .subtitle { margin: 5px 0 0; color: #d4def7; font-size: 14px; }
+    main { max-width: 1120px; margin: 28px auto; padding: 0 18px 40px; }
+    .intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 22px; flex-wrap: wrap; }
+    .intro h2 { margin: 0 0 7px; font-size: 24px; }
+    .intro p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .badge { background: #e8edff; color: #2e4dc0; border-radius: 999px; padding: 8px 12px; font-weight: 700; font-size: 12px; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px; }
+    .stat, .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
+    .stat { padding: 19px 21px; }
+    .stat-label { color: var(--muted); font-size: 13px; font-weight: 600; }
+    .stat-value { font-size: 30px; font-weight: 800; margin-top: 8px; letter-spacing: -1px; }
+    .stat-note { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start; }
+    .card { padding: 22px; }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card-desc { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 7px; }
+    input, select { width: 100%; padding: 12px 13px; border: 1px solid #d8dfeb; border-radius: 10px; background: #fff; color: var(--ink); font: inherit; outline: none; }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px #3659d91a; }
+    button { border: 0; border-radius: 10px; padding: 11px 14px; font: inherit; font-weight: 700; cursor: pointer; transition: .15s ease; }
+    button:focus-visible { outline: 3px solid #9eb0ff; outline-offset: 2px; }
+    .primary { background: var(--primary); color: white; width: 100%; margin-top: 19px; padding: 13px; }
+    .primary:hover { background: var(--primary-dark); }
+    .secondary { background: #edf1fa; color: #26385e; }
+    .danger { background: #fff0f1; color: var(--danger); padding: 8px 10px; font-size: 12px; }
+    .table-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .table-head h3 { margin: 0 0 4px; }
+    .table-head p { margin: 0; color: var(--muted); font-size: 13px; }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    .search { max-width: 240px; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 540px; }
+    th { text-align: left; font-size: 11px; color: #788398; text-transform: uppercase; letter-spacing: .7px; padding: 12px 10px; background: #f8faff; border-bottom: 1px solid var(--line); }
+    td { padding: 14px 10px; border-bottom: 1px solid #edf0f5; font-size: 13px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .student-name { font-weight: 750; }
+    .roll { color: var(--muted); }
+    .class-pill { display: inline-block; padding: 5px 9px; border-radius: 999px; background: #eef2ff; color: #3653ba; font-size: 11px; font-weight: 700; }
+    .empty { text-align: center; padding: 42px 15px; color: var(--muted); }
+    .empty-icon { font-size: 30px; margin-bottom: 8px; }
+    .notice { margin-top: 20px; background: #fff8e8; border: 1px solid #f3e2b8; color: #72551b; padding: 13px 15px; border-radius: 12px; font-size: 12px; line-height: 1.5; }
+    footer { text-align: center; color: #7c8798; font-size: 12px; padding: 0 15px 25px; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #17264b; color: white; padding: 12px 18px; border-radius: 10px; box-shadow: var(--shadow); display: none; z-index: 10; max-width: calc(100vw - 30px); font-size: 13px; }
+    @media (max-width: 850px) { .layout { grid-template-columns: 1fr; } .stats { gap: 10px; } .stat { padding: 15px; } }
+    @media (max-width: 520px) { main { margin-top: 20px; padding-inline: 12px; } .stats { grid-template-columns: 1fr; } .stat-value { font-size: 25px; } .card { padding: 17px; } .search { max-width: 100%; width: 100%; } .table-head { align-items: stretch; } .tools { width: 100%; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo" aria-hidden="true">🎓</div>
+      <div>
+        <h1>Student Management System</h1>
+        <p class="subtitle">A simple and smart way to manage student records</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div>
+        <h2>Student Dashboard</h2>
+        <p>Add, search, and manage student information from one place.</p>
+      </div>
+      <span class="badge">COLLEGE PROJECT DEMO</span>
+    </section>
+
+    <section class="stats" aria-label="Student statistics">
+      <div class="stat"><div class="stat-label">Total Students</div><div class="stat-value" id="totalCount">0</div><div class="stat-note">All saved records</div></div>
+      <div class="stat"><div class="stat-label">Classes Represented</div><div class="stat-value" id="classCount">0</div><div class="stat-note">Unique class groups</div></div>
+      <div class="stat"><div class="stat-label">Recently Added</div><div class="stat-value" id="recentCount">0</div><div class="stat-note">Added in this session</div></div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h3>Add a Student</h3>
+        <p class="card-desc">Enter the student's details below. Required fields are marked with an asterisk.</p>
+        <form id="studentForm">
+          <label for="studentName">Full Name *</label>
+          <input id="studentName" name="studentName" placeholder="e.g. Ali Khan" maxlength="70" required>
+          <label for="rollNumber">Roll Number *</label>
+          <input id="rollNumber" name="rollNumber" placeholder="e.g. ICS-102" maxlength="25" required>
+          <label for="studentClass">Class / Program *</label>
+          <select id="studentClass" name="studentClass" required>
+            <option value="">Select class</option>
+            <option>1st Year - Pre-Engineering</option>
+            <option>1st Year - Pre-Medical</option>
+            <option>1st Year - ICS</option>
+            <option>2nd Year - Pre-Engineering</option>
+            <option>2nd Year - Pre-Medical</option>
+            <option>2nd Year - ICS</option>
+            <option>Other</option>
+          </select>
+          <label for="studentEmail">Email (optional)</label>
+          <input id="studentEmail" name="studentEmail" type="email" placeholder="student@example.com" maxlength="100">
+          <button class="primary" type="submit">＋ Add Student</button>
+        </form>
+        <div class="notice"><strong>Demo note:</strong> Records are saved in this browser on this device. This is a learning project, not a secure official student database.</div>
+      </div>
+
+      <div class="card">
+        <div class="table-head">
+          <div><h3>Student Records</h3><p id="recordSummary">No students added yet</p></div>
+          <div class="tools">
+            <input class="search" id="searchInput" type="search" placeholder="Search students…" aria-label="Search students">
+            <button class="secondary" id="exportBtn" type="button">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Student</th><th>Roll Number</th><th>Class / Program</th><th>Email</th><th>Action</th></tr></thead>
+            <tbody id="studentTable"></tbody>
+          </table>
+          <div class="empty" id="emptyState"><div class="empty-icon">📚</div><strong>No student records yet</strong><div style="margin-top:6px;font-size:13px">Use the form to add your first student.</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>Student Management System · Built with HTML, CSS & JavaScript · Educational demo</footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "collegeStudentManager_v1";
+    let students = [];
+    let recentlyAdded = 0;
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      students = Array.isArray(saved) ? saved : [];
+    } catch (e) { students = []; }
+
+    const form = document.getElementById("studentForm");
+    const tableBody = document.getElementById("studentTable");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const toast = document.getElementById("toast");
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.style.display = "none", 2600);
+    }
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(students)); }
+      catch (e) { showToast("Could not save in this browser. Check storage settings."); }
+    }
+    function safeText(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+    function render() {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = students.filter(s =>
+        [s.name, s.roll, s.className, s.email].some(v => String(v || "").toLowerCase().includes(query))
+      );
+      document.getElementById("totalCount").textContent = students.length;
+      document.getElementById("classCount").textContent = new Set(students.map(s => s.className)).size;
+      document.getElementById("recentCount").textContent = recentlyAdded;
+      document.getElementById("recordSummary").textContent =
+        `${filtered.length} shown · ${students.length} total record${students.length === 1 ? "" : "s"}`;
+      tableBody.innerHTML = filtered.map(s => `<tr>
+        <td><span class="student-name">${safeText(s.name)}</span></td>
+        <td><span class="roll">${safeText(s.roll)}</span></td>
+        <td><span class="class-pill">${safeText(s.className)}</span></td>
+        <td>${safeText(s.email || "—")}</td>
+        <td><button class="danger" type="button" data-delete="${safeText(s.id)}" aria-label="Delete ${safeText(s.name)}">Delete</button></td>
+      </tr>`).join("");
+      emptyState.style.display = filtered.length ? "none" : "block";
+      if (!students.length) emptyState.innerHTML = '<div class="empty-icon">📚</div><strong>No student records yet</strong><div style="margin-top:6px;font-size:13px">Use the form to add your first student.</div>';
+      else if (!filtered.length) emptyState.innerHTML = '<div class="empty-icon">🔎</div><strong>No matching students</strong><div style="margin-top:6px;font-size:13px">Try a different name, roll number, or class.</div>';
+    }
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const name = document.getElementById("studentName").value.trim();
+      const roll = document.getElementById("rollNumber").value.trim();
+      const className = document.getElementById("studentClass").value;
+      const email = document.getElementById("studentEmail").value.trim();
+      if (!name || !roll || !className) return;
+      if (students.some(s => s.roll.toLowerCase() === roll.toLowerCase())) {
+        showToast("That roll number already exists. Please use a unique one.");
+        document.getElementById("rollNumber").focus();
+        return;
+      }
+      students.unshift({ id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random())), name, roll, className, email });
+      recentlyAdded++;
+      save();
+      form.reset();
+      render();
+      showToast("Student added successfully!");
+      document.getElementById("studentName").focus();
+    });
+    tableBody.addEventListener("click", event => {
+      const button = event.target.closest("[data-delete]");
+      if (!button) return;
+      const student = students.find(s => s.id === button.dataset.delete);
+      if (!student) return;
+      if (confirm(`Delete the record for ${student.name}?`)) {
+        students = students.filter(s => s.id !== button.dataset.delete);
+        save();
+        render();
+        showToast("Student record deleted.");
+      }
+    });
+    searchInput.addEventListener("input", render);
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      if (!students.length) { showToast("Add at least one student before exporting."); return; }
+      const rows = [["Full Name", "Roll Number", "Class / Program", "Email"], ...students.map(s => [s.name, s.roll, s.className, s.email])];
+      const csv = rows.map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = "student-records.csv"; link.click();
+      URL.revokeObjectURL(url);
+      showToast("CSV file exported.");
+    });
+    render();
+  </script>
+</body>
+</html>
